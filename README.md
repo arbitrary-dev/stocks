@@ -1,7 +1,7 @@
 Stocks
 ======
 
-When you are a fancy aspiring guy who wants to track their stocks prices…
+When you are a fancy aspiring guy who wants to track his stocks prices…
 
 Just create `~/.stocks` with your favorite stocks:
 ```
