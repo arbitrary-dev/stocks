@@ -4,6 +4,8 @@ Stocks
 
 When you are a fancy aspiring guy who wants to track his stocks prices…
 
+![screenshot](https://github.com/arbitrary-dev/stocks/raw/master/screenshot.png "screenshot")
+
 Just create `~/.stocks` with your favorite stocks:
 ```
 AAPL:
