@@ -1,5 +1,6 @@
 Stocks
 ======
+[![v0.5](https://img.shields.io/badge/download-v0.5-brightgreen.svg)](https://github.com/arbitrary-dev/stocks/releases/download/v0.5/stocks-0.5.app.zip)
 
 When you are a fancy aspiring guy who wants to track his stocks prices…
 
