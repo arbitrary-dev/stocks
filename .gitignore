@@ -1,0 +1,8 @@
+Cartfile.resolved
+Carthage/
+bin/
+xcuserdata/
+
+*.swp
+*.orig
+.DS_Store
