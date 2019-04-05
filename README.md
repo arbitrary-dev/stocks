@@ -6,7 +6,10 @@ When you are a fancy aspiring guy who wants to track his stocks prices…
 
 ![screenshot](https://github.com/arbitrary-dev/stocks/raw/master/screenshot.png "screenshot")
 
+## Configuration
+
 Just create `~/.stocks` with your favorites:
+
 ```
 AAPL:
   market : nasdaq
@@ -16,7 +19,8 @@ FAG:
   id     : SSE903
 ```
 
-Markets supported:
+## Supported markets
+
 - `nasdaq` – [Nasdaq](https://www.nasdaq.com)
 - `nasdaqomxnordic` – [Nasdaq for nordic markets](http://www.nasdaqomxnordic.com)  
   To retrieve `id` for stock just lookup `Instrument` query parameter from URL
