@@ -14,7 +14,7 @@ FAG:
 ```
 
 Markets supported:
-- `nasdaq` ([Nasdaq](https://www.nasdaq.com))
-- `nasdaqomxnordic` ([Nasdaq for nordic markets](http://www.nasdaqomxnordic.com))  
+- `nasdaq` – [Nasdaq](https://www.nasdaq.com)
+- `nasdaqomxnordic` – [Nasdaq for nordic markets](http://www.nasdaqomxnordic.com)  
   To retrieve `id` for stock just lookup `Instrument` query parameter from URL
   address.
