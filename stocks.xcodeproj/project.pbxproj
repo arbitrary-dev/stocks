@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		664AF25422A6FF0E006214C5 /* RxSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664AF25322A6FF0E006214C5 /* RxSwift.framework */; };
+		664AF25522A6FF0E006214C5 /* RxSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 664AF25322A6FF0E006214C5 /* RxSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		666071BA210CA70D00ED30F5 /* app.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666071B9210CA70D00ED30F5 /* app.swift */; };
 		666071BE210CA70E00ED30F5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 666071BD210CA70E00ED30F5 /* Assets.xcassets */; };
 		666071C1210CA70E00ED30F5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 666071BF210CA70E00ED30F5 /* Main.storyboard */; };
@@ -22,6 +24,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				664AF25522A6FF0E006214C5 /* RxSwift.framework in Embed Frameworks */,
 				66E0999421D56452007C849A /* Yaml.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -30,6 +33,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		664AF25322A6FF0E006214C5 /* RxSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RxSwift.framework; path = Carthage/Build/Mac/RxSwift.framework; sourceTree = "<group>"; };
 		666071B6210CA70D00ED30F5 /* stocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = stocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		666071B9210CA70D00ED30F5 /* app.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app.swift; sourceTree = "<group>"; };
 		666071BD210CA70E00ED30F5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -47,6 +51,7 @@
 			files = (
 				666071CC210CBBA600ED30F5 /* Kanna.framework in Frameworks */,
 				66E0999321D56452007C849A /* Yaml.framework in Frameworks */,
+				664AF25422A6FF0E006214C5 /* RxSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,6 +61,7 @@
 		666071AD210CA70D00ED30F5 = {
 			isa = PBXGroup;
 			children = (
+				664AF25322A6FF0E006214C5 /* RxSwift.framework */,
 				66E0999221D56452007C849A /* Yaml.framework */,
 				666071B8210CA70D00ED30F5 /* stocks */,
 				666071B7210CA70D00ED30F5 /* Products */,

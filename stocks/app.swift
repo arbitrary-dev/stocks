@@ -1,6 +1,7 @@
 import Cocoa
 import Kanna
 import Yaml
+import RxSwift
 
 // Connect Travis CI
 // TODO add menu with exit button
@@ -22,6 +23,8 @@ FAG:
 
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
+    var polling: Disposable?
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         var yaml = defaultYaml
 
@@ -32,11 +35,24 @@ FAG:
         catch {/* error handling here */}
 
         stocks = try! Yaml.load(yaml)
-        update(self)
-        statusItem.button!.action = #selector(update(_:))
+        switchOrUpdate(self)
+        statusItem.button!.action = #selector(switchOrUpdate(_:))
+
+        let subject = BehaviorSubject<Int>(value: 666) // To start eagerly
+        let interval = Observable<Int>.interval(10, scheduler: ConcurrentDispatchQueueScheduler(qos: .background))
+
+        // TODO map to case classes: Update, Switch, SwitchAndUpdate
+
+        polling = Observable.of(subject, interval)
+            .merge()
+            .subscribe { event in
+                print(event)
+            }
+
+        subject.onNext(999)
     }
 
-    @objc func update(_ sender: Any?) {
+    @objc func switchOrUpdate(_ sender: Any?) {
         if let button = statusItem.button {
             button.imagePosition = NSControl.ImagePosition.imageLeft
             let img = NSImage(named: NSImage.Name("icons8-increase-filled-128"))!
@@ -126,7 +142,7 @@ FAG:
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+        polling!.dispose()
     }
 }
 
