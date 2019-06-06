@@ -8,6 +8,8 @@ import RxSwift
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
+    let updatePeriod: RxTimeInterval = 15 * 60 // 15 minutes
+
     let file = ".stocks"
     let defaultYaml = """
 AAPL:
@@ -19,10 +21,11 @@ FAG:
 """
 
     var stocks: Yaml?
-    var position: Int = -2
+    var position: Int = 0
 
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
+    let subject = PublishSubject<Event>()
     var polling: Disposable?
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -35,61 +38,94 @@ FAG:
         catch {/* error handling here */}
 
         stocks = try! Yaml.load(yaml)
-        switchOrUpdate(self)
-        statusItem.button!.action = #selector(switchOrUpdate(_:))
 
-        let subject = BehaviorSubject<Int>(value: 666) // To start eagerly
-        let interval = Observable<Int>.interval(10, scheduler: ConcurrentDispatchQueueScheduler(qos: .background))
-
-        // TODO map to case classes: Update, Switch, SwitchAndUpdate
-
-        polling = Observable.of(subject, interval)
-            .merge()
-            .subscribe { event in
-                print(event)
-            }
-
-        subject.onNext(999)
-    }
-
-    @objc func switchOrUpdate(_ sender: Any?) {
         if let button = statusItem.button {
             button.imagePosition = NSControl.ImagePosition.imageLeft
             let img = NSImage(named: NSImage.Name("icons8-increase-filled-128"))!
             img.size = NSSize(width: 22, height: 22)
             button.image = img
+            button.action = #selector(onButtonPressed)
+            // let longGesture = NSPressGestureRecognizer(...)
+            // button.addGestureRecognizer(longGesture)
+        }
 
-            let count = stocks!.dictionary!.count
-            position = (position + 2)
-            if position >= count {
-                position = 0
-            }
+        let updates: Observable<Event> =
+            Observable<Int>.timer(0, period: updatePeriod, scheduler: ConcurrentDispatchQueueScheduler(qos: .background))
+                .map { _ in .update }
 
-            let ss = stocks!.dictionary!.dropFirst(position).prefix(2)
-            var text = ""
-
-            for (stock, params) in ss {
-                let stock: String = stock.string!
-                let market: String = params["market"].string!
-                let id: String? = params["id"].string
-
-                if !text.isEmpty {
-                    text += "\n"
+        polling = Observable.of(subject, updates)
+            .merge()
+            .subscribe {
+                print($0.element ?? $0)
+                switch $0.element {
+                case .some(.update):
+                    self.updateData()
+                case .some(.next):
+                    self.next()
+                default:
+                    ()
                 }
-
-                text += getData(market, stock, id)
             }
+    }
 
-            if count > 1 && ss.count == 1 {
+    @objc func onButtonPressed(_ sender: Any?) {
+        subject.onNext(.next)
+    }
+
+    private func next() {
+        let count = stocks!.dictionary!.count
+        position = (position + 2)
+        if position >= count {
+            position = 0
+        }
+        updateUi()
+    }
+
+    private func updateData() {
+        let ss = stocks!.dictionary!
+
+        updateUi(isLoading: true)
+
+        for (stock, params) in ss {
+            let stock = stock.string!
+            let market = params["market"].string!
+            let id = params["id"].string
+
+            stocks![.string(stock)]["value"] = .string(getData(market, stock, id))
+        }
+
+        updateUi(isLoading: false)
+    }
+
+    private func updateUi(isLoading: Bool? = nil) {
+        let ss = stocks!.dictionary!.dropFirst(position).prefix(2)
+        var text = ""
+
+        for (stock, params) in ss {
+            let stock: String = stock.string!
+            let value: String = params["value"].string ?? "…"
+
+            if !text.isEmpty {
                 text += "\n"
             }
 
-            button.attributedTitle = NSAttributedString(
-                string: text,
-                attributes: [
-                    NSAttributedStringKey.font: NSFont(name: "Helvetica", size: count > 1 ? 8 : 10)!
-                ]
-            )
+            text += "\(stock) \(value)"
+        }
+
+        let count = stocks!.dictionary!.count
+
+        // Trickery to make a lonely value take its place at the top.
+        if count > 1 && ss.count == 1 {
+            text += "\n"
+        }
+
+        DispatchQueue.main.async {
+            var attrs = [NSAttributedStringKey: AnyObject]()
+            attrs[NSAttributedStringKey.font] = NSFont(name: "Helvetica", size: count > 1 ? 8 : 10)!
+            if let l = isLoading {
+                attrs[NSAttributedStringKey.foregroundColor] = l ? NSColor.controlShadowColor : NSColor.controlTextColor
+            }
+            self.statusItem.button!.attributedTitle = NSAttributedString(string: text, attributes: attrs)
         }
     }
 
@@ -109,7 +145,6 @@ FAG:
             if let doc = try? HTML(url: URL(string: "https://nasdaq.com/symbol/\(symbol)")!, encoding: .utf8) {
                 let today = xp(doc, "//div[b/text()[contains(., 'Today')]]/following-sibling::div").replacingOccurrences(of: ",", with: "")
                 let arr = re("[0-9]+\\.?[0-9]*", today).map { Double($0)! }
-                print(today)
                 if arr.count != 2 {
                     break
                 }
@@ -120,7 +155,7 @@ FAG:
         default:
             break
         }
-        return "\(symbol) \(value)"
+        return value
     }
 
     private func xp(_ doc: HTMLDocument, _ path: String) -> String {
@@ -145,4 +180,3 @@ FAG:
         polling!.dispose()
     }
 }
-
