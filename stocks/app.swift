@@ -134,11 +134,15 @@ FAG:
         print("Loading \(symbol)…")
         switch market {
         case "nasdaqomxnordic":
-            if let doc = try? HTML(url: URL(string: "https://www.nasdaqomxnordic.com/webproxy/DataFeedProxy.aspx?SubSystem=Prices&Instrument=\(id!)&Action=GetInstrument&inst.an=lp,hp")!, encoding: .utf8) {
-                // TODO if Today is not available, then take current value
+            if let doc = try? HTML(url: URL(string: "https://www.nasdaqomxnordic.com/webproxy/DataFeedProxy.aspx?SubSystem=Prices&Instrument=\(id!)&Action=GetInstrument&inst.an=lp,hp,lsp")!, encoding: .utf8) {
                 if let low = Double(xp(doc, "//*/@lp") ?? "no value") {
                     if let high = Double(xp(doc, "//*/@hp") ?? "no value") {
                         value = String(format: "%.0f–%.0f", low, high)
+                    }
+                }
+                if value == nil {
+                    if let latest = Double(xp(doc, "//*/@lsp") ?? "no value") {
+                        value = String(format: "%.0f", latest)
                     }
                 }
             }
@@ -152,6 +156,11 @@ FAG:
                     let low = arr.min()!
                     let high = arr.max()!
                     value = String(format: "%.0f–%.0f", low, high)
+                }
+                if value == nil {
+                    if let latest = Double(xp(doc, "//*[@id='qwidget_lastsale']/text()")?.replacingOccurrences(of: "$", with: "") ?? "no value") {
+                        value = String(format: "%.0f", latest)
+                    }
                 }
             }
         default:
