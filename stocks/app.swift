@@ -130,36 +130,39 @@ FAG:
     }
 
     private func getData(_ market: String, _ symbol: String, _ id: String? = nil) -> String {
-        var value: String = "n/a"
+        var value: String?
+        print("Loading \(symbol)…")
         switch market {
         case "nasdaqomxnordic":
             if let doc = try? HTML(url: URL(string: "https://www.nasdaqomxnordic.com/webproxy/DataFeedProxy.aspx?SubSystem=Prices&Instrument=\(id!)&Action=GetInstrument&inst.an=lp,hp")!, encoding: .utf8) {
                 // TODO if Today is not available, then take current value
-                if let low = Double(xp(doc, "//*/@lp")) {
-                    if let high = Double(xp(doc, "//*/@hp")) {
+                if let low = Double(xp(doc, "//*/@lp") ?? "no value") {
+                    if let high = Double(xp(doc, "//*/@hp") ?? "no value") {
                         value = String(format: "%.0f–%.0f", low, high)
                     }
                 }
             }
         case "nasdaq":
             if let doc = try? HTML(url: URL(string: "https://nasdaq.com/symbol/\(symbol)")!, encoding: .utf8) {
-                let today = xp(doc, "//div[b/text()[contains(., 'Today')]]/following-sibling::div").replacingOccurrences(of: ",", with: "")
-                let arr = re("[0-9]+\\.?[0-9]*", today).map { Double($0)! }
-                if arr.count != 2 {
-                    break
+                if let today = xp(doc, "//div[b/text()[contains(., 'Today')]]/following-sibling::div")?.replacingOccurrences(of: ",", with: "") {
+                    let arr = re("[0-9]+\\.?[0-9]*", today).compactMap { Double($0) }
+                    if arr.count != 2 {
+                        break
+                    }
+                    let low = arr.min()!
+                    let high = arr.max()!
+                    value = String(format: "%.0f–%.0f", low, high)
                 }
-                let low = arr.min()!
-                let high = arr.max()!
-                value = String(format: "%.0f–%.0f", low, high)
             }
         default:
             break
         }
-        return value
+        print("Done \(symbol): \(value ?? "n/a")")
+        return value ?? "n/a"
     }
 
-    private func xp(_ doc: HTMLDocument, _ path: String) -> String {
-        return doc.xpath(path).first!.text!.trimmingCharacters(in: .whitespacesAndNewlines)
+    private func xp(_ doc: HTMLDocument, _ path: String) -> String? {
+        return doc.xpath(path).first?.text?.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func re(_ regex: String, _ text: String) -> [String] {
