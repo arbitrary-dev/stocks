@@ -21,7 +21,7 @@ FAG:
 
 ## Supported markets
 
-- `nasdaq` – [Nasdaq](https://www.nasdaq.com)
+- ~~`nasdaq` – [Nasdaq](https://www.nasdaq.com)~~ broken :'(
 - `nasdaqomxnordic` – [Nasdaq for nordic markets](http://www.nasdaqomxnordic.com)  
   To retrieve `id` for stock just lookup `Instrument` query parameter from URL
   address.
